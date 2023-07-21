@@ -1,35 +1,38 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
-class Program
+public class ArduinoUdpClient
 {
-    static void Main()
+    private const int LocalPort = 5001;
+
+    public static void Main()
     {
-        IPAddress serverIP = IPAddress.Parse("192.168.137.227"); 
-        int serverPort = 2390; 
+        UdpClient udpClient = new UdpClient(LocalPort);
+        udpClient.EnableBroadcast = true;
 
-       
-        using (UdpClient client = new UdpClient())
+        try
         {
-           
-            client.Connect(serverIP, serverPort);
+            Console.WriteLine("UDP client started. Waiting for data...");
 
-         
-            string messageToSend = "Harish is tanker!";
-            byte[] dataToSend = Encoding.ASCII.GetBytes(messageToSend);
-            client.Send(dataToSend, dataToSend.Length);
 
-           
-            IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            byte[] receivedData = client.Receive(ref serverEndPoint);
-            string receivedMessage = Encoding.ASCII.GetString(receivedData);
-
-            Console.WriteLine("Received message: " + receivedMessage);
+            while (true)
+            {
+                IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                byte[] receivedData = udpClient.Receive(ref remoteEndPoint);
+                string receivedString = System.Text.Encoding.ASCII.GetString(receivedData);
+                if (receivedString != null)
+                {
+                    Console.WriteLine(receivedString);
+                }
+            }
         }
-
-        Console.WriteLine("Press any key to exit.");
-        Console.ReadKey();
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error: " + ex.Message);
+        }
+        finally
+        {
+            udpClient.Close();
+        }
     }
 }
