@@ -1,38 +1,38 @@
-﻿using System.Net;
+﻿using System;
 using System.Net.Sockets;
+using System.Text;
 
-public class ArduinoUdpClient
+public class ArduinoTcpClient
 {
-    private const int LocalPort = 5001;
+    private const string ServerIPAddress = "192.168.137.244"; // Replace with the Arduino's IP address
+    private const int ServerPort = 5001; // Replace with the Arduino's server port
 
     public static void Main()
     {
-        UdpClient udpClient = new UdpClient(LocalPort);
-        udpClient.EnableBroadcast = true;
-
         try
         {
-            Console.WriteLine("UDP client started. Waiting for data...");
+            TcpClient client = new TcpClient();
+            client.Connect(ServerIPAddress, ServerPort);
 
+            Console.WriteLine("Connected to Arduino TCP server.");
+
+            NetworkStream stream = client.GetStream();
 
             while (true)
             {
-                IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                byte[] receivedData = udpClient.Receive(ref remoteEndPoint);
-                string receivedString = System.Text.Encoding.ASCII.GetString(receivedData);
-                if (receivedString != null)
-                {
-                    Console.WriteLine(receivedString);
-                }
+                byte[] receiveBuffer = new byte[1024];
+                int bytesRead = stream.Read(receiveBuffer, 0, receiveBuffer.Length);
+                string receivedData = Encoding.ASCII.GetString(receiveBuffer, 0, bytesRead);
+                Console.WriteLine("Received data from Arduino: " + receivedData);
             }
+
+            // Close the connection
+            stream.Close();
+            client.Close();
         }
         catch (Exception ex)
         {
             Console.WriteLine("Error: " + ex.Message);
-        }
-        finally
-        {
-            udpClient.Close();
         }
     }
 }
