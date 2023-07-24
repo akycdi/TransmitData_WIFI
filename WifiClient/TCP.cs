@@ -7,7 +7,7 @@ public class TCP
     private const string ServerIPAddress = "192.168.137.244"; // Replace with the Arduino's IP address
     private const int ServerPort = 5001; // Replace with the Arduino's server port
 
-    public static void Main()
+    public static void TCP12()
     {
         try
         {

@@ -5,7 +5,7 @@ public class UDP
 {
     private const int LocalPort = 5001;
 
-    public static void Main()
+    public  void UD1P()
     {
         UdpClient udpClient = new UdpClient(LocalPort);
         udpClient.EnableBroadcast = true;
