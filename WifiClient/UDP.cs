@@ -1,28 +1,40 @@
-﻿using System.Net;
+﻿using System;
+using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 
 public class UDP
 {
     private const int LocalPort = 5001;
 
-    public  void UD1P()
+    public static void Main()
     {
         UdpClient udpClient = new UdpClient(LocalPort);
         udpClient.EnableBroadcast = true;
+
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        int packetsReceived = 0;
 
         try
         {
             Console.WriteLine("UDP client started. Waiting for data...");
 
-
             while (true)
             {
-                IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                byte[] receivedData = udpClient.Receive(ref remoteEndPoint);
-                string receivedString = System.Text.Encoding.ASCII.GetString(receivedData);
-                if (receivedString != null)
+                if (udpClient.Available > 0)
                 {
-                    Console.WriteLine(receivedString);
+                    IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                    byte[] receivedData = udpClient.Receive(ref remoteEndPoint);
+                    packetsReceived++;
+                }
+
+                if (stopwatch.ElapsedMilliseconds >= 1000)
+                {
+                    Console.WriteLine("FPS: " + packetsReceived);
+                    packetsReceived = 0;
+                    stopwatch.Restart();
                 }
             }
         }

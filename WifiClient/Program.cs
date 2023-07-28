@@ -7,7 +7,7 @@ public class ArduinoTcpClient
     private const string ServerIPAddress = "192.168.137.107"; 
     private const int ServerPort = 5001;
 
-    public static void Main()
+    public static void Main2()
     {
         try
         {
